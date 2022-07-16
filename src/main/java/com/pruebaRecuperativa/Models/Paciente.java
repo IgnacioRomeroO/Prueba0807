@@ -1,7 +1,11 @@
 package com.pruebaRecuperativa.Models;
 
 
+
 import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
+
 
 @Entity
 @Table(name="pacientes")
@@ -9,13 +13,19 @@ public class Paciente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    //Atributos//
-
     private Long id;
     private String rut;
     private String nombre;
     private String fechaNacimiento;
+
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CitaMedica> citaMedica;
+
+    @Column(updatable = false)
+    private Date createdAt;
+    private Date updatedAt;
+
+
 
     //Constructores//
 
@@ -24,12 +34,13 @@ public class Paciente {
         super();
     }
 
-    public Paciente(Long id, String rut, String nombre, String fechaNacimiento) {
+    public Paciente(Long id, String rut, String nombre, String fechaNacimiento, List<CitaMedica> citaMedica) {
         super();
         this.id = id;
         this.rut = rut;
         this.nombre = nombre;
         this.fechaNacimiento = fechaNacimiento;
+        this.citaMedica = citaMedica;
     }
 
     //Getters & Setters//
@@ -67,7 +78,21 @@ public class Paciente {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idPaciente")
-    private CitaMedica citaMedica;
+    public List<CitaMedica> getCitaMedica() {
+        return citaMedica;
+    }
+
+    public void setCitaMedica(List<CitaMedica> citaMedica) {
+        this.citaMedica = citaMedica;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = new Date();
+    }
 }
